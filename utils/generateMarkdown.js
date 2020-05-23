@@ -1,7 +1,29 @@
 function generateMarkdown(data) {
   return `
-# ${data.title}
+# Title: ${data.name}
 
+# Description : 
+ ** ${data.description}
+
+
+# Usage :
+ ${data.usage}
+
+# License
+
+ ${data.license}
+
+ # contributors
+
+ ${data.contributors}
+
+ # github username
+
+ ${data.github}
+
+<img src="${data.githubImage}" alt="Avatar" width="30" />
+
+Email: ${data.gHEmail}
 `;
 }
 

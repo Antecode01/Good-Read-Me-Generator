@@ -1,5 +1,7 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
+const axios = require("axios");
+let generateMarkdown = require("./utils/generateMarkdown");
 
 inquirer
   .prompt([
@@ -29,9 +31,10 @@ inquirer
       message: "What is usage of your project?",
     },
     {
-      type: "input",
+      type: "list",
       name: "license",
       message: "what is the license for your project?",
+      choices: ["MIT", "The Unlicense", "ISC", "Microsoft Public License"],
     },
     {
       type: "input",
@@ -45,25 +48,26 @@ inquirer
     },
     {
       type: "input",
-      name: "image",
-      message: "provide the url for github profile image?",
-    },
-
-    {
-      type: "input",
-      name: "email",
-      message: "Provide the email for your github",
+      name: "github",
+      message: "provide your github username.",
     },
   ])
   .then(function (data) {
-    var filename = data.name.toLowerCase().split(" ").join("") + ".json";
+    let githubUsername = data.github;
+    let githubUrl =
+      "https://api.github.com/users/" + githubUsername + "/events/public";
 
-    fs.writeFile(filename, JSON.stringify(data, null, "\t"), function (err) {
-      if (err) {
-        return console.log(err);
-      }
+    axios.get(githubUrl).then(function (res) {
+      let githubImage = res.data[0].actor.avatar_url;
+      data["githubImage"] = githubImage;
+      let gHEmail = res.data[0].payload.commits[0].author.email;
+      data["gHEmail"] = gHEmail;
 
-      console.log("Success!");
+      fs.writeFile("README.md", generateMarkdown(data), function (err) {
+        if (err) {
+          console.log(err);
+        }
+      });
     });
   });
 
